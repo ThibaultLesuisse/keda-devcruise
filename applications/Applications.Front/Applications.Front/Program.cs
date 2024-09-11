@@ -27,8 +27,6 @@ app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Applications.Front.Client._Imports).Assembly);
+    .AddInteractiveServerRenderMode();
 
 app.Run();

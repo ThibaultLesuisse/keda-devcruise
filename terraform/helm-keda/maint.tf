@@ -7,7 +7,7 @@ provider "helm" {
   }
 }
 
-resource "helm_release" "redis" {
+resource "helm_release" "keda" {
   name             = "keda"
   namespace        = "keda"
   repository       = "https://kedacore.github.io/charts"

@@ -1,0 +1,6 @@
+resources:
+  - ../webapplication/serviceaccount.yaml
+
+patchesStrategicMerge:
+  - patch.yaml
+
