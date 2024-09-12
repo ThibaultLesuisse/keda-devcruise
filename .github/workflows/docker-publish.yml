@@ -67,4 +67,9 @@ jobs:
           file: "applications/Applications.Functions/Docker/Dockerfile"
           cache-from: type=Docker
           cache-to: type=gha,mode=max
+      
+      - name: Print variables
+        run: |
+          ${{ steps.build-and-push-function.outputs.metadata.image.name }}
+
 

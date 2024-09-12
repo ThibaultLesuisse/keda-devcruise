@@ -13,5 +13,11 @@ terraform {
       version = "=4.0.1"
     }
   }
+  backend "azurerm" {
+      resource_group_name  = "common"
+      storage_account_name = "terraformstatethibault"
+      container_name       = "devcruise"
+      key                  = "terraform.tfstate"
+  }
   required_version = "~> 1.3"
 }
