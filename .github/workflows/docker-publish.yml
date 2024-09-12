@@ -50,10 +50,21 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@v5 # v5.0.0
         with:
-          context: .
+          context: applications/Applications.Front
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
+          tags: "1.2"
+          file: "applications/Applications.Front/Dockerfile"
+          cache-from: type=Docker
+          cache-to: type=gha,mode=max
+      
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v5 # v5.0.0
+        with:
+          context: applications/Applications.Functions
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: "1.2"
+          file: "applications/Applications.Functions/Docker/Dockerfile"
+          cache-from: type=Docker
           cache-to: type=gha,mode=max
 
