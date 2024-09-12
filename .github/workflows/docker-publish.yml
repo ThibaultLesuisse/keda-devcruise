@@ -66,9 +66,11 @@ jobs:
           cache-to: type=gha,mode=max
       
       - name: Print variables
-        run: |
-          echo ${{ steps.build-and-push-function.outputs.Metadata }}
-          apt install jq
-          echo ${{ steps.build-and-push-function.outputs.Metadata }} | jq .["image.name"]
+        uses: sergeysova/jq-action@v2
+        with:
+          cmd: 'jq .["image.name"] ${{ steps.build-and-push-function.outputs.Metadata }}'
+
+      - name: Show my version
+        run: 'echo "version ${{ steps.version.outputs.value }}"'
 
 
