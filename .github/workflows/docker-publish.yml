@@ -67,6 +67,8 @@ jobs:
       
       - name: Print variables
         run: |
+          echo ${{ steps.build-and-push-function.outputs.Metadata }}
+          sudo apt install jq
           echo ${{ steps.build-and-push-function.outputs.Metadata }} | jq .["image.name"]
 
 
