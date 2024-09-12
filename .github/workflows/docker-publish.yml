@@ -68,7 +68,7 @@ jobs:
       - name: Print variables
         uses: sergeysova/jq-action@v2
         with:
-          cmd: 'jq .["image.name"] ${{ steps.build-and-push-function.outputs.Metadata }}'
+          cmd: 'jq .["image.name"] "${{ steps.build-and-push-function.outputs.Metadata }}" -r'
 
       - name: Show my version
         run: 'echo "version ${{ steps.version.outputs.value }}"'
