@@ -13,4 +13,19 @@ resource "helm_release" "keda" {
   repository       = "https://kedacore.github.io/charts"
   chart            = "keda"
   create_namespace = true
+
+  set {
+    name  = "podIdentity.azureWorkload.enabled"
+    value = "true"
+  }
+
+  set {
+    name  = "podIdentity.azureWorkload.clientId"
+    value = var.keda_umi_client_id
+  }
+
+  set {
+    name  = "podIdentity.azureWorkload.tenantId"
+    value = "7f484261-aa92-4e35-8e51-d881f5d830b5"
+  }
 }

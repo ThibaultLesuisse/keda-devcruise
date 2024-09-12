@@ -18,3 +18,7 @@ variable "aks_cluster_ca_certificate" {
   type        = string
   description = "The AKS client certificate"
 }
+
+variable "keda_umi_client_id" {
+  type = string
+}

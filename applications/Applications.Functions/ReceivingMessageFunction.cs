@@ -14,7 +14,7 @@ public class ReceivingMessageFunction
     }
     [Function("RecievingMessage")]
     public void Run(
-        [ServiceBusTrigger("queue", Connection = "ServiceBusConnection")] ServiceBusReceivedMessage message,
+        [ServiceBusTrigger("keda_servicebus_queue", Connection = "ServiceBusConnection")] ServiceBusReceivedMessage message,
         FunctionContext context)
     {
         // Use a string array to return more than one message.
