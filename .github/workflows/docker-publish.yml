@@ -16,9 +16,6 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
-
 
 jobs:
   build:
@@ -70,6 +67,6 @@ jobs:
       
       - name: Print variables
         run: |
-          ${{ steps.build-and-push-function.outputs.metadata.image.name }}
+          echo ${{ steps.build-and-push-function.outputs.metadata.image.name }}
 
 
