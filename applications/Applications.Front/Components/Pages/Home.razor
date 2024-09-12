@@ -1,0 +1,67 @@
+﻿@page "/"
+@using Azure.Messaging.ServiceBus
+@using Azure.Identity
+
+<PageTitle>KEDA</PageTitle>
+
+<h2>Send 1000 messages</h2>
+
+<button @onclick="SendMessagesAsync">Nuke Cluster</button>
+
+@code {
+
+    private async Task SendMessagesAsync()
+    {
+        ServiceBusClient client;
+        ServiceBusSender sender;
+
+        const int numOfMessages = 1000;
+
+        var clientOptions = new ServiceBusClientOptions
+        { 
+            TransportType = ServiceBusTransportType.AmqpWebSockets,
+        };
+        client = new ServiceBusClient(
+            "keda-euricom-servicebus-namespace.servicebus.windows.net",
+            new DefaultAzureCredential(new DefaultAzureCredentialOptions
+            {
+                ExcludeEnvironmentCredential = true,
+                ExcludeManagedIdentityCredential = true,
+                ExcludeInteractiveBrowserCredential = true,
+                ExcludeVisualStudioCredential = true,
+                ExcludeAzurePowerShellCredential = true,
+                ExcludeSharedTokenCacheCredential = true,
+                ExcludeVisualStudioCodeCredential = true,
+                // We Want these!
+                ExcludeWorkloadIdentityCredential = false,
+                ExcludeAzureCliCredential = false
+            }),
+            clientOptions);
+        
+        sender = client.CreateSender("keda_servicebus_queue");
+
+        using ServiceBusMessageBatch messageBatch = await sender.CreateMessageBatchAsync();
+
+        for (var i = 1; i <= numOfMessages; i++)
+        {
+            // try adding a message to the batch
+            if (!messageBatch.TryAddMessage(new ServiceBusMessage($"Message {i}")))
+            {
+                // if it is too large for the batch
+                throw new Exception($"The message {i} is too large to fit in the batch.");
+            }
+        }
+
+        try
+        {
+            // Use the producer client to send the batch of messages to the Service Bus queue
+            await sender.SendMessagesAsync(messageBatch);
+            Console.WriteLine($"A batch of {numOfMessages} messages has been published to the queue.");
+        }
+        finally
+        {
+            await sender.DisposeAsync();
+            await client.DisposeAsync();
+        }
+    }
+}
