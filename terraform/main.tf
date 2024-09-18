@@ -148,6 +148,14 @@ module "keda" {
   keda_umi_client_id         = azurerm_user_assigned_identity.umi_keda_operator.client_id
 }
 
+module "redis" {
+  source                     = "./helm-redis"
+  aks_host_endpoint          = azurerm_kubernetes_cluster.aks-keda.kube_config[0].host
+  aks_client_certificate     = base64decode(azurerm_kubernetes_cluster.aks-keda.kube_config[0].client_certificate)
+  aks_client_key             = base64decode(azurerm_kubernetes_cluster.aks-keda.kube_config[0].client_key)
+  aks_cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.aks-keda.kube_config[0].cluster_ca_certificate)
+}
+
 
 resource "kubernetes_deployment_v1" "application_deployment" {
   metadata {
@@ -272,46 +280,46 @@ resource "kubernetes_service_account_v1" "function_service_account" {
   }
 }
 
-resource "kubernetes_manifest" "triggerAuth" {
+# resource "kubernetes_manifest" "triggerAuth" {
 
-  manifest = {
-    apiVersion = "keda.sh/v1alpha1"
-    kind       = "TriggerAuthentication"
-    metadata = {
-      namespace = "default"
-      name      = "azure-servicebus-auth"
-    }
-    spec = {
-      podIdentity = {
-        provider = "azure-workload"
-      }
-    }
-  }
-}
+#   manifest = {
+#     apiVersion = "keda.sh/v1alpha1"
+#     kind       = "TriggerAuthentication"
+#     metadata = {
+#       namespace = "default"
+#       name      = "azure-servicebus-auth"
+#     }
+#     spec = {
+#       podIdentity = {
+#         provider = "azure-workload"
+#       }
+#     }
+#   }
+# }
 
-resource "kubernetes_manifest" "scaledObject" {
-  manifest = {
-    apiVersion = "keda.sh/v1alpha1"
-    kind       = "ScaledObject"
-    metadata = {
-      name      = "azure-servicebus-queue-scaledobject"
-      namespace = "default"
-    }
-    spec = {
-      scaleTargetRef = {
-        name = "devcruise-function-deployment"
-      }
-      triggers = [{
-        type = "azure-servicebus"
-        metadata = {
-          "queueName"    = "keda_servicebus_queue"
-          "namespace"    = "keda-euricom-servicebus-namespace"
-          "messageCount" = "10"
-        }
-        authenticationRef = {
-          name = "azure-servicebus-auth"
-        }
-      }]
-    }
-  }
-}
+# resource "kubernetes_manifest" "scaledObject" {
+#   manifest = {
+#     apiVersion = "keda.sh/v1alpha1"
+#     kind       = "ScaledObject"
+#     metadata = {
+#       name      = "azure-servicebus-queue-scaledobject"
+#       namespace = "default"
+#     }
+#     spec = {
+#       scaleTargetRef = {
+#         name = "devcruise-function-deployment"
+#       }
+#       triggers = [{
+#         type = "azure-servicebus"
+#         metadata = {
+#           "queueName"    = "keda_servicebus_queue"
+#           "namespace"    = "keda-euricom-servicebus-namespace"
+#           "messageCount" = "10"
+#         }
+#         authenticationRef = {
+#           name = "azure-servicebus-auth"
+#         }
+#       }]
+#     }
+#   }
+# }

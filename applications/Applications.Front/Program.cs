@@ -1,4 +1,7 @@
 using Applications.Front.Components;
+using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Azure;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +9,28 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.AddAzureClients(sb =>
+{
+    sb
+        .AddServiceBusClient("keda-euricom-servicebus-namespace.servicebus.windows.net")
+        .ConfigureOptions(options =>
+        {
+            options.TransportType = ServiceBusTransportType.AmqpWebSockets;
+            options.RetryOptions = new ServiceBusRetryOptions
+            {
+                MaxRetries = 3,
+                Mode = ServiceBusRetryMode.Exponential
+            };
+        })
+        .WithName("servicebus");
+    
+    sb.AddClient<ServiceBusSender, ServiceBusClientOptions>((options, _, provider) 
+            => provider.GetService<ServiceBusClient>()!.CreateSender("keda_servicebus_queue"))
+        .WithName("servicebus");
+});
+builder.Services.AddSingleton<ConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect("redis.redis-master.svc.cluster.local:6379"));
 
 var app = builder.Build();
 

@@ -1,0 +1,75 @@
+@page "/"
+@using Applications.Shared
+@using Azure.Messaging.ServiceBus
+@using Microsoft.Extensions.Azure
+@using System.Text.Json
+@using StackExchange.Redis
+@inject IAzureClientFactory<ServiceBusSender> SenderFactory
+@inject ConnectionMultiplexer ConnectionMultiplexer
+
+<table>
+    <thead>Name</thead>
+    <thead>Number of votes</thead>
+    @foreach (var voteResult in _votes)
+    {
+        <tr>
+            <td>@voteResult.Key</td>
+            <td>@voteResult.Value</td>
+        </tr>
+    }
+</table>
+
+@foreach(var practiceManager in Enum.GetValues<PracticeManagerEnum>())
+{
+    <button @onclick="() => SendMessagesAsync(practiceManager)">@practiceManager</button>
+}
+
+@code {
+    private const int numOfMessages = 100;
+    private Dictionary<string, long> _votes = new ();
+    
+    protected override void OnInitialized()
+    {
+        var database = ConnectionMultiplexer.GetDatabase();
+
+        foreach (var value in Enum.GetNames<PracticeManagerEnum>())
+        {
+            var numberOfVotes = database.StringGet(value);
+
+            if (!_votes.Keys.Contains(value))
+            {
+                _votes.TryAdd(value, Convert.ToInt64(numberOfVotes));
+            }
+            else
+            {
+                _votes[value] = Convert.ToInt64(numberOfVotes.ToString());
+            }
+        }
+    }
+
+    
+    public async Task SendMessagesAsync(PracticeManagerEnum practiceManager)
+    {
+        var sender = SenderFactory.CreateClient("servicebus");
+
+        using ServiceBusMessageBatch messageBatch = await sender.CreateMessageBatchAsync();
+
+        for (var i = 1; i <= numOfMessages; i++)
+        {
+            if (!messageBatch.TryAddMessage(new ServiceBusMessage(JsonSerializer.Serialize(new Vote {PracticeManager = practiceManager}))))
+            {
+                throw new Exception($"The message {i} is too large to fit in the batch.");
+            }
+        }
+
+        try
+        {
+            await sender.SendMessagesAsync(messageBatch);
+            Console.WriteLine($"A batch of {numOfMessages} messages has been published to the queue.");
+        }
+        finally
+        {
+            await sender.DisposeAsync();
+        }
+    }
+}
