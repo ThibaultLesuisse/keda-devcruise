@@ -7,14 +7,13 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Applications.Front.csproj", "./"]
-RUN dotnet restore "Applications.Front.csproj"
-COPY . .
-RUN dotnet build "Applications.Front.csproj" -c $BUILD_CONFIGURATION -o /app/build
+COPY ["../", "./"]
+RUN dotnet restore "Applications.Front/Applications.Front.csproj"
+RUN dotnet build "Applications.Front/Applications.Front.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "Applications.Front.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Applications.Front/Applications.Front.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
