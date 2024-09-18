@@ -1,7 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS installer-env
 
 COPY . /src/dotnet-function-app
-RUN cd Applications.Functions/src/dotnet-function-app && \
+RUN ls
+RUN cd /Applications.Front/src/dotnet-function-app && \
 mkdir -p /home/site/wwwroot && \
 dotnet publish *.csproj --output /home/site/wwwroot
 
