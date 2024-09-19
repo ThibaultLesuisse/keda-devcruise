@@ -13,4 +13,19 @@ resource "helm_release" "keda" {
   repository       = "oci://registry-1.docker.io/bitnamicharts/"
   chart            = "redis"
   create_namespace = true
+
+  set {
+    name  = "auth.enabled"
+    value = "true"
+  }
+
+  set {
+    name  = "auth.password"
+    value = "admin"
+  }
+
+  set {
+    name  = "global.redis.password"
+    value = "admin"
+  }
 }

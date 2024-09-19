@@ -30,7 +30,7 @@ builder.Services.AddAzureClients(sb =>
         .WithName("servicebus");
 });
 builder.Services.AddSingleton<ConnectionMultiplexer>(
-    ConnectionMultiplexer.Connect("redis.redis-master.svc.cluster.local:6379"));
+    ConnectionMultiplexer.Connect("admin@redis.redis-master.svc.cluster.local:6379"));
 
 var app = builder.Build();
 
