@@ -4,6 +4,6 @@ public enum PracticeManagerEnum
 {
     Luk,
     Ellen,
-    DeGentenaar,
-    DeNieuwe
+    Bo,
+    Christophe
 }

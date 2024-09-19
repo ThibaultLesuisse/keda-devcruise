@@ -27,13 +27,20 @@
 @code {
     private const int numOfMessages = 100;
     private Dictionary<string, long> _votes = new ();
-    
-    protected override void OnInitialized()
-    {
-        var database = ConnectionMultiplexer.GetDatabase();
 
+    private Timer _timer;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _timer = new Timer(async _ => await CheckForUpdates(), null, 0, 1000);
+        await base.OnInitializedAsync();
+    }
+    
+    private async Task CheckForUpdates()
+    {
         foreach (var value in Enum.GetNames<PracticeManagerEnum>())
         {
+            var database = ConnectionMultiplexer.GetDatabase();
             var numberOfVotes = database.StringGet(value);
 
             if (!_votes.Keys.Contains(value))
@@ -45,6 +52,12 @@
                 _votes[value] = Convert.ToInt64(numberOfVotes.ToString());
             }
         }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 
     
