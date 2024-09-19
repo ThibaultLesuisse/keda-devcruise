@@ -13,7 +13,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddAzureClients(sb =>
 {
     sb
-        .AddServiceBusClient("keda-euricom-servicebus-namespace.servicebus.windows.net")
+        .AddServiceBusClient(builder.Configuration.GetConnectionString("ServiceBus"))
         .ConfigureOptions(options =>
         {
             options.TransportType = ServiceBusTransportType.AmqpWebSockets;
@@ -22,8 +22,7 @@ builder.Services.AddAzureClients(sb =>
                 MaxRetries = 3,
                 Mode = ServiceBusRetryMode.Exponential
             };
-        })
-        .WithName("servicebus");
+        });
     
     sb.AddClient<ServiceBusSender, ServiceBusClientOptions>((options, _, provider) 
             => provider.GetService<ServiceBusClient>()!.CreateSender("keda_servicebus_queue"))

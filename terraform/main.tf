@@ -189,6 +189,10 @@ resource "kubernetes_deployment_v1" "application_deployment" {
           port {
             container_port = 8080
           }
+          env {
+            name = "ConnectionStrings__ServiceBus"
+            value = module.servicebus.servicebus_connections
+          }
         }
       }
     }
