@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS installer-env
 
 COPY . .
-RUN cd Applications.Front && \
+RUN cd Applications.Functions && \
 mkdir -p /home/site/wwwroot && \
 dotnet publish *.csproj --output /home/site/wwwroot
 
