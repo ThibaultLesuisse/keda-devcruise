@@ -27,8 +27,4 @@
     <ItemGroup>
       <ProjectReference Include="..\Applications.Shared\Applications.Shared.csproj" />
     </ItemGroup>
-    <ItemGroup>
-      <None Remove="local.settings.json" />
-      <Content Include="local.settings.json" />
-    </ItemGroup>
 </Project>
