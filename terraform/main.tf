@@ -183,14 +183,14 @@ resource "kubernetes_deployment_v1" "application_deployment" {
       spec {
         service_account_name = kubernetes_service_account_v1.application_service_account.metadata[0].name
         container {
-          name  = "api"
-          image = var.image_id_keda_application
+          name              = "api"
+          image             = var.image_id_keda_application
           image_pull_policy = "Always"
           port {
             container_port = 8080
           }
           env {
-            name = "ConnectionStrings__ServiceBus"
+            name  = "ConnectionStrings__ServiceBus"
             value = module.servicebus.servicebus_connections
           }
         }
@@ -255,17 +255,27 @@ resource "kubernetes_deployment_v1" "function_deployment" {
       spec {
         service_account_name = kubernetes_service_account_v1.function_service_account.metadata[0].name
         container {
-          name  = "function"
-          image = var.image_id_keda_function
+          name              = "function"
+          image             = var.image_id_keda_function
           image_pull_policy = "Always"
           port {
             container_port = 8080
           }
-          
+
           env {
             name  = "ServiceBusConnection"
             value = module.servicebus.servicebus_connections
           }
+
+          env {
+            name  = "AzureWebJobsStorage"
+            value = "UseDevelopmentStorage=true"
+          }
+          env {
+            name  = "FUNCTIONS_WORKER_RUNTIME"
+            value = "dotnet-isolated"
+          }
+
           env {
             name  = "AzureWebJobsStorage__credential"
             value = "workloadidentity"
