@@ -18,10 +18,10 @@ public class ReceivingMessageFunction
         _logger = logger;
         _connectionMultiplexer = connectionMultiplexer;
     }
-    [Function("RecievingMessage")]
+    
+    [Function("ReceivingMessage")]
     public void Run(
-        [ServiceBusTrigger("keda_servicebus_queue", Connection = "ServiceBusConnection")] ServiceBusReceivedMessage message,
-        FunctionContext context)
+        [ServiceBusTrigger("keda_servicebus_queue", Connection = "ServiceBusConnection")] ServiceBusReceivedMessage message)
     {
         try
         {
