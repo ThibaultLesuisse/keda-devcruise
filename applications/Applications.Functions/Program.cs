@@ -10,7 +10,7 @@ var host = new HostBuilder()
         s.AddApplicationInsightsTelemetryWorkerService();
         s.ConfigureFunctionsApplicationInsights();
         s.AddSingleton<ConnectionMultiplexer>(
-            ConnectionMultiplexer.Connect("redis.redis-master.svc.cluster.local:6379"));
+            ConnectionMultiplexer.Connect("redis-master.redis.svc.cluster.local:6379,password=admin"));
     })
     .Build();
 
