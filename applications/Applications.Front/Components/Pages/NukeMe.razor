@@ -63,9 +63,8 @@
     {
         _timer?.Dispose();
     }
-
     
-    public async Task SendMessagesAsync(PracticeManagerEnum practiceManager)
+    private async Task SendMessagesAsync(PracticeManagerEnum practiceManager)
     {
         var sender = SenderFactory.CreateClient("servicebus");
 
@@ -78,15 +77,8 @@
                 throw new Exception($"The message {i} is too large to fit in the batch.");
             }
         }
-
-        try
-        {
-            await sender.SendMessagesAsync(messageBatch);
-            Console.WriteLine($"A batch of {numOfMessages} messages has been published to the queue.");
-        }
-        finally
-        {
-            await sender.DisposeAsync();
-        }
+        
+        await sender.SendMessagesAsync(messageBatch);
+        Console.WriteLine($"A batch of {numOfMessages} messages has been published to the queue.");
     }
 }
