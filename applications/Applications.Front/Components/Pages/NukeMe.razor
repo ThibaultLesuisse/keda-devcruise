@@ -34,7 +34,7 @@
     {
         _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
         await base.OnInitializedAsync();
-        CheckForUpdates()
+        CheckForUpdates();
     }
     
     private async Task CheckForUpdates()
