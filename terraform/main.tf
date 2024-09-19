@@ -271,6 +271,7 @@ resource "kubernetes_deployment_v1" "function_deployment" {
             name  = "AzureWebJobsStorage"
             value = "UseDevelopmentStorage=true"
           }
+          
           env {
             name  = "FUNCTIONS_WORKER_RUNTIME"
             value = "dotnet-isolated"
