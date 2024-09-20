@@ -30,7 +30,7 @@ resource "azurerm_kubernetes_cluster" "aks-keda" {
     node_count           = 2
     vm_size              = "Standard_B2ms"
     auto_scaling_enabled = true
-    min_count            = 1
+    min_count            = 3
     max_count            = 10
     max_pods             = 150
   }
@@ -165,7 +165,7 @@ resource "kubernetes_deployment_v1" "application_deployment" {
     }
   }
   spec {
-    replicas = 1
+    replicas = 3
     selector {
       match_labels = {
         app = "devcruise-app"
@@ -271,7 +271,7 @@ resource "kubernetes_deployment_v1" "function_deployment" {
             name  = "AzureWebJobsStorage"
             value = "UseDevelopmentStorage=true"
           }
-          
+
           env {
             name  = "FUNCTIONS_WORKER_RUNTIME"
             value = "dotnet-isolated"
@@ -332,7 +332,7 @@ resource "kubernetes_manifest" "scaledObject" {
         metadata = {
           "queueName"    = "keda_servicebus_queue"
           "namespace"    = "keda-euricom-servicebus-namespace"
-          "messageCount" = "10"
+          "messageCount" = "100"
         }
         authenticationRef = {
           name = "azure-servicebus-auth"
