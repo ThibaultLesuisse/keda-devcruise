@@ -1,6 +1,7 @@
 using Applications.Front.Components;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Azure;
+using MudBlazor.Services;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
-
+builder.Services.AddMudServices();
 builder.Services.AddAzureClients(sb =>
 {
     sb

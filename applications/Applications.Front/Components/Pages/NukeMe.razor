@@ -8,6 +8,7 @@
 @inject ConnectionMultiplexer ConnectionMultiplexer
 
 <table>
+    <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
     <thead>Name</thead>
     <thead>Number of votes</thead>
     @foreach (var voteResult in _votes)
@@ -21,17 +22,23 @@
 
 @foreach(var practiceManager in Enum.GetValues<PracticeManagerEnum>())
 {
-    <button @onclick="() => SendMessagesAsync(practiceManager)">@practiceManager</button>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" @onclick="() => SendMessagesAsync(practiceManager)">@practiceManager</MudButton>
 }
 
 @code {
     private const int numOfMessages = 100;
     private Dictionary<string, long> _votes = new ();
-
+    public string[] XAxisLabels;
     private static PeriodicTimer _timer;
+    private int Index = -1;
+    public List<ChartSeries> Series;
     
     protected override async Task OnInitializedAsync()
     {
+        XAxisLabels = Enum.GetNames<PracticeManagerEnum>();
+        Series = Enum.GetNames<PracticeManagerEnum>()
+            .Select(pm => new ChartSeries() { Name = pm, Data = new double[0] })
+            .ToList();
         _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
         await base.OnInitializedAsync();
         CheckForUpdates();
@@ -45,6 +52,8 @@
             {
                 var database = ConnectionMultiplexer.GetDatabase();
                 var numberOfVotes = database.StringGet(value);
+
+                Series.Where(x => x.Name == value).First().Data = new[] { Convert.ToDouble(numberOfVotes) };
 
                 if (!_votes.Keys.Contains(value))
                 {

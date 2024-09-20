@@ -5,5 +5,6 @@ public enum PracticeManagerEnum
     Luk,
     Ellen,
     Bo,
-    Christophe
+    Christophe,
+    Gilles
 }
