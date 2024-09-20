@@ -7,22 +7,12 @@
 @inject IAzureClientFactory<ServiceBusSender> SenderFactory
 @inject ConnectionMultiplexer ConnectionMultiplexer
 
-<table>
-    <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
-    <thead>Name</thead>
-    <thead>Number of votes</thead>
-    @foreach (var voteResult in _votes)
-    {
-        <tr>
-            <td>@voteResult.Key</td>
-            <td>@voteResult.Value</td>
-        </tr>
-    }
-</table>
+<MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
+
 
 @foreach(var practiceManager in Enum.GetValues<PracticeManagerEnum>())
 {
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" @onclick="() => SendMessagesAsync(practiceManager)">@practiceManager</MudButton>
+    <MudButton Class="my-10" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" @onclick="() => SendMessagesAsync(practiceManager)">@practiceManager</MudButton>
 }
 
 @code {
@@ -64,7 +54,8 @@
                     _votes[value] = Convert.ToInt64(numberOfVotes.ToString());
                 }
             }
-            await InvokeAsync(StateHasChanged);
+            
+            StateHasChanged();
         }
     }
 
