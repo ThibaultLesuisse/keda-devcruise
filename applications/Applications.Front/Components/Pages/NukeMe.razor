@@ -7,28 +7,31 @@
 @inject IAzureClientFactory<ServiceBusSender> SenderFactory
 @inject ConnectionMultiplexer ConnectionMultiplexer
 
-<MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
+<MudPaper>
+    <MudContainer>
+        <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
+        @foreach(var practiceManager in Enum.GetValues<PracticeManagerEnum>())
+        {
+            <MudButton Class="my-10" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" @onclick="() => SendMessagesAsync(practiceManager)">@practiceManager</MudButton>
+        }
+        </MudContainer>
+</MudPaper>
 
-
-@foreach(var practiceManager in Enum.GetValues<PracticeManagerEnum>())
-{
-    <MudButton Class="my-10" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" @onclick="() => SendMessagesAsync(practiceManager)">@practiceManager</MudButton>
-}
 
 @code {
     private const int numOfMessages = 100;
     private Dictionary<string, long> _votes = new ();
-    public string[] XAxisLabels;
+    private string[] XAxisLabels = Enum.GetNames<PracticeManagerEnum>();
     private static PeriodicTimer _timer;
     private int Index = -1;
     public List<ChartSeries> Series;
     
     protected override async Task OnInitializedAsync()
     {
-        XAxisLabels = Enum.GetNames<PracticeManagerEnum>();
         Series = Enum.GetNames<PracticeManagerEnum>()
             .Select(pm => new ChartSeries() { Name = pm, Data = new double[0] })
             .ToList();
+        
         _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
         await base.OnInitializedAsync();
         CheckForUpdates();
@@ -38,23 +41,21 @@
     {
         while (await _timer.WaitForNextTickAsync())
         {
+            var chartSeries = new List<ChartSeries>(5);
+            
             foreach (var value in Enum.GetNames<PracticeManagerEnum>())
             {
                 var database = ConnectionMultiplexer.GetDatabase();
                 var numberOfVotes = database.StringGet(value);
 
-                Series.Where(x => x.Name == value).First().Data = new[] { Convert.ToDouble(numberOfVotes) };
-
-                if (!_votes.Keys.Contains(value))
+                chartSeries.Add(new ChartSeries
                 {
-                    _votes.TryAdd(value, Convert.ToInt64(numberOfVotes));
-                }
-                else
-                {
-                    _votes[value] = Convert.ToInt64(numberOfVotes.ToString());
-                }
+                    Name = value,
+                    Data = new double[] { Convert.ToDouble(numberOfVotes) }
+                });
             }
-            
+
+            Series = chartSeries;
             StateHasChanged();
         }
     }
